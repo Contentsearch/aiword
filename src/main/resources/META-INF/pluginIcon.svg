@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+    <!-- Background Gradient -->
+    <defs>
+        <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#a8e6cf;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#56ab2f;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+
+    <!-- Green Background -->
+    <rect width="200" height="200" rx="20" ry="20" fill="url(#greenGradient)" />
+
+    <!-- Tree Brain Concept -->
+    <g fill="none" stroke="#ffffff" stroke-width="5">
+        <!-- Tree Roots (Brain's lower part) -->
+        <path d="M70,125 Q50,145 40,160 Q55,170 70,160 Q80,150 90,160 Q100,170 110,160 Q120,150 110,140 Q100,135 90,140 Q80,130 70,125 Z" />
+        <!-- Tree Trunk (Brain's Stem) -->
+        <path d="M100,70 Q105,50 110,60 Q115,70 120,70 Q130,80 140,100 Q130,110 125,120 Q120,130 110,125 Q100,120 90,120 Q80,110 75,100 Q80,90 90,80 Q100,70 100,70 Z" />
+        <!-- Tree Branches (Brain's Neurons) -->
+        <path d="M85,75 Q70,65 60,60 Q50,55 40,60 Q30,70 35,80 Q45,90 55,85 Q65,80 70,75 Z" />
+        <path d="M110,75 Q125,65 135,60 Q145,55 155,60 Q165,70 160,80 Q150,90 140,85 Q130,80 125,75 Z" />
+    </g>
+
+    <!-- Word Text -->
+    <text x="100" y="60" font-family="Arial, sans-serif" font-size="30" fill="white" text-anchor="middle">WORD</text>
+
+    <!-- Banner with MNEMONIC Text -->
+    <rect x="35" y="145" width="130" height="40" rx="10" ry="10" fill="white" />
+    <text x="100" y="170" font-family="Arial, sans-serif" font-size="16" fill="#56ab2f" text-anchor="middle">MNEMONIC</text>
+</svg>
