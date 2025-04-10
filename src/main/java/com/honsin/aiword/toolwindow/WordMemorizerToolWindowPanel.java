@@ -12,10 +12,12 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.Alarm;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -33,9 +35,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class WordMemorizerToolWindowPanel {
+public class WordMemorizerToolWindowPanel implements Disposable {
     private static final String KEY_CURRENT_PAGE = "wordMemorizer.currentPage";
     private static final String KEY_WORDS_PER_PAGE = "wordMemorizer.wordsPerPage";
+    private Alarm notificationExpireAlarm;
     private JPanel mainPanel;
     private JSpinner wordCountSpinner;
     private JButton startButton;
@@ -62,10 +65,11 @@ public class WordMemorizerToolWindowPanel {
     private static final String KEY_SELECTED_WORDBOOK = "wordMemorizer.selectedWordbook";
 
     public WordMemorizerToolWindowPanel(Project project) {
-
         this.project = project;
         this.wordbookService = WordbookService.getInstance();
         this.ttsService = new YoudaoTtsService(); // Create an instance
+
+        this.notificationExpireAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD, this);
 
         setupTable();
         setupSpinner();
@@ -324,8 +328,10 @@ public class WordMemorizerToolWindowPanel {
             });
         });
     }
+
     /**
      * 在当前表格页中查找指定的单词，并高亮显示该行1秒钟。
+     *
      * @param wordToFind 要查找的单词 (大小写不敏感)
      */
     private boolean findAndHighlightWord(String wordToFind) {
@@ -432,16 +438,38 @@ public class WordMemorizerToolWindowPanel {
 
     // Helper methods for notifications (reuse or create)
     private void showInfoNotification(String message) {
-        Notification notification = NotificationGroupManager.getInstance().getNotificationGroup("WordMemorizerNotifications")
+        // 1. 创建 Notification 对象
+        // 使用 final 变量，以便在 Lambda 表达式中使用
+        final Notification notification = NotificationGroupManager.getInstance()
+                .getNotificationGroup("WordMemorizerNotifications") // 确保组 ID 正确
                 .createNotification("单词本操作", message, NotificationType.INFORMATION);
+
+        // 2. 显示通知
+        // 确保在 EDT 上显示 (虽然 Bus.notify 通常是安全的，但明确一下更好)
         Notifications.Bus.notify(notification, project);
-        // Make it expire? Add Alarm logic if desired.
+
+        // 3. 使用 Alarm 安排 1.5 秒后过期的任务
+        notificationExpireAlarm.addRequest(() -> {
+            // 在执行 expire 前检查通知是否已被用户手动关闭或已过期
+            if (!notification.isExpired()) {
+                notification.expire(); // 使通知消失
+                System.out.println("Auto-expired info notification: " + message);
+            }
+        }, 1500); // 延迟时间，单位毫秒
     }
 
     private void showErrorNotification(String message) {
         Notification notification = NotificationGroupManager.getInstance().getNotificationGroup("WordMemorizerNotifications")
                 .createNotification("错误", message, NotificationType.WARNING); // Use WARNING or ERROR
         Notifications.Bus.notify(notification, project);
+        // 3. 使用 Alarm 安排 2 秒后过期的任务
+        notificationExpireAlarm.addRequest(() -> {
+            // 在执行 expire 前检查通知是否已被用户手动关闭或已过期
+            if (!notification.isExpired()) {
+                notification.expire(); // 使通知消失
+                System.out.println("Auto-expired info notification: " + message);
+            }
+        }, 2000); // 延迟时间，单位毫秒
     }
 
     private void refreshWordbookList() {
@@ -474,9 +502,9 @@ public class WordMemorizerToolWindowPanel {
             }
         } catch (IOException e) {
             // 可以在这里显示短暂错误，或只在日志记录
-             showErrorNotification("扫描单词本目录失败: " + e.getMessage());
+            showErrorNotification("扫描单词本目录失败: " + e.getMessage());
             // 保持列表不变可能比清空更好
-             selectDictComboBox.setModel(new DefaultComboBoxModel<>());
+            selectDictComboBox.setModel(new DefaultComboBoxModel<>());
             return; // 扫描失败，不更新列表
         }
 
@@ -556,6 +584,10 @@ public class WordMemorizerToolWindowPanel {
     }
 
 
+    @Override
+    public void dispose() {
+        System.out.println("WordMemorizerToolWindowPanel disposed.");
+    }
 }
 
 // Helper class for putting a button in a JTable cell
