@@ -25,6 +25,10 @@ public class WordTableModel extends AbstractTableModel {
         fireTableDataChanged(); // Notify the table that the data has completely changed
     }
 
+    public List<WordEntry> getWordsOnCurrentPage() {
+        return this.words;
+    }
+
     public void setTranslationsHidden(boolean hidden) {
         if (this.translationsHidden != hidden) {
             this.translationsHidden = hidden;

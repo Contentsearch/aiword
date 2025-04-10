@@ -47,6 +47,8 @@ public class WordMemorizerToolWindowPanel {
     private JButton nextPageButton;
     private JLabel pageInfoLabel;
     private JComboBox selectDictComboBox;
+    private JTextField wordInputField;
+    private JCheckBox autoFayin;
 
     private final Project project;
     private final WordbookService wordbookService;
@@ -81,6 +83,7 @@ public class WordMemorizerToolWindowPanel {
             showInfoNotification("请选择一个单词本并点击 '加载选中词库'。");
         }
         System.out.println("WordMemorizerToolWindowPanel constructor finished."); // 添加日志
+        wordInputField.setToolTipText("输入单词并按 Enter 键查找高亮");
     }
 
 
@@ -299,6 +302,80 @@ public class WordMemorizerToolWindowPanel {
         });
 
 
+        // ------------------------------------
+
+        wordInputField.addActionListener(e -> {
+            System.out.println(">>> DEBUG: ActionListener FIRED!");
+            SwingUtilities.invokeLater(() -> { // 延迟到当前事件处理结束后执行
+                String textInInvokeLater = wordInputField.getText();
+                System.out.println(">>> DEBUG: Text obtained inside invokeLater: [" + textInInvokeLater + "]");
+                String textToFind = textInInvokeLater.trim();
+
+                if (!textToFind.isEmpty()) {
+                    if (findAndHighlightWord(textToFind) && autoFayin.isSelected()) {
+                        ttsService.pronounceWordAsync(project, textToFind);
+                    }
+
+                    wordInputField.setText("");
+                    System.out.println(">>> DEBUG: Input field cleared AFTER processing (invokeLater).");
+                } else {
+                    System.out.println(">>> DEBUG: Text was empty inside invokeLater.");
+                }
+            });
+        });
+    }
+    /**
+     * 在当前表格页中查找指定的单词，并高亮显示该行1秒钟。
+     * @param wordToFind 要查找的单词 (大小写不敏感)
+     */
+    private boolean findAndHighlightWord(String wordToFind) {
+        List<WordEntry> currentPageWords = tableModel.getWordsOnCurrentPage(); // 获取当前页数据
+        if (currentPageWords == null || currentPageWords.isEmpty()) {
+            System.out.println("No words on the current page to search in.");
+            return false; // 当前页无数据
+        }
+
+        int targetRowIndex = -1; // 目标行在当前 Model 中的索引
+        for (int i = 0; i < currentPageWords.size(); i++) {
+            WordEntry entry = currentPageWords.get(i);
+            if (entry != null && wordToFind.equalsIgnoreCase(entry.getWord())) {
+                targetRowIndex = i; // 找到匹配项
+                break; // 找到第一个就停止
+            }
+        }
+
+        if (targetRowIndex != -1) {
+            // 找到了单词！
+            System.out.println("Found word '" + wordToFind + "' at model row index: " + targetRowIndex);
+
+            // --- 高亮逻辑 ---
+            final int rowToSelect = targetRowIndex; // 在 Lambda 中需要 final 或 effectively final
+
+            // 1. 滚动到可见区域 (确保在 EDT 上执行)
+            SwingUtilities.invokeLater(() -> {
+                wordTable.setRowSelectionInterval(rowToSelect, rowToSelect); // 选中行
+                Rectangle cellRect = wordTable.getCellRect(rowToSelect, 0, true); // 获取单元格矩形
+                if (cellRect != null) {
+                    wordTable.scrollRectToVisible(cellRect); // 滚动表格使该行可见
+                }
+
+                // 2. 设置 Timer 在 1 秒后清除选中状态
+                Timer highlightTimer = new Timer(600, timerEvent -> {
+                    // 检查选中的行是否还是我们之前选中的那一行 (可选，以防用户快速操作)
+                    if (wordTable.getSelectedRow() == rowToSelect) {
+                        wordTable.clearSelection(); // 清除选中
+                    }
+                });
+                highlightTimer.setRepeats(false); // 只执行一次
+                highlightTimer.start(); // 启动定时器
+            });
+            return true;
+        } else {
+            // 未找到单词
+            System.out.println("Word '" + wordToFind + "' not found on the current page.");
+
+            return false;
+        }
     }
 
     private void loadWordsFromSelectedFile() {
@@ -499,9 +576,6 @@ class ButtonColumn extends AbstractCellEditor implements TableCellRenderer, Tabl
 
         // Action listener for the editor button
         editorButton.addActionListener(e -> {
-            // Fire editing stopped AFTER the action is performed.
-            // This allows the listener external to ButtonColumn (added in setupActionListeners)
-            // to get the correct editing row before it's cleared.
             SwingUtilities.invokeLater(() -> fireEditingStopped());
         });
 

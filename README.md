@@ -1,8 +1,7 @@
 # AiWord
 
 [![Version](https://img.shields.io/jetbrains/plugin/v/YOUR_PLUGIN_ID.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/YOUR_PLUGIN_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/YOUR_PLUGIN_ID.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/YOUR_PLUGIN_ID)
-[![License](https://img.shields.io/github/license/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME.svg?style=flat-square)](LICENSE)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/YOUR_PLUGIN_ID.svg?style=flat-square)](https://github.com/Contentsearch/aiword/releases/download/0.0.1/aiword-0.0.1-SNAPSHOT.zip)
 
 **AiWord** 是一款强大的 IntelliJ IDEA 插件，旨在通过在IDEA中实现背单词的功能，采用快速记忆法的方式来帮助用户快速掌握新单词。
 

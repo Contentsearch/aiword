@@ -58,6 +58,6 @@ public class WordMemorizerToolWindowFactory implements ToolWindowFactory, DumbAw
     @Override
     public void init(@NotNull ToolWindow window) {
         // Optional initialization when tool window first shows
-        window.setStripeTitle("Word Memorizer"); // Title shown on the tool window stripe button
+        window.setStripeTitle("AiWord Memorizer"); // Title shown on the tool window stripe button
     }
 }

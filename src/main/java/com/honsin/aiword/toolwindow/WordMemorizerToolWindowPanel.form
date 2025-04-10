@@ -55,13 +55,29 @@
       </component>
       <component id="2790e" class="com.intellij.ui.table.JBTable" binding="wordTable">
         <constraints border-constraint="Center"/>
-        <properties/>
+        <properties>
+          <preferredScrollableViewportSize width="150" height="42"/>
+        </properties>
       </component>
       <grid id="5188d" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
         <constraints border-constraint="South"/>
         <properties/>
         <border type="none"/>
         <children>
+          <component id="c40ac" class="javax.swing.JCheckBox" binding="autoFayin">
+            <constraints/>
+            <properties>
+              <text value="发音"/>
+            </properties>
+          </component>
+          <component id="6be2" class="javax.swing.JTextField" binding="wordInputField">
+            <constraints/>
+            <properties>
+              <columns value="20"/>
+              <horizontalAlignment value="2"/>
+              <text value=""/>
+            </properties>
+          </component>
           <component id="2ddd8" class="javax.swing.JButton" binding="previousPageButton">
             <constraints/>
             <properties>
