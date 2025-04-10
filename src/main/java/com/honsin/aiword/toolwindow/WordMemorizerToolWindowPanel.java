@@ -619,11 +619,10 @@ class ButtonColumn extends AbstractCellEditor implements TableCellRenderer, Tabl
 
     @Override
     protected void fireEditingStopped() {
-        // Important: Only fire if editing was actually active
         if (isEditorActive) {
             super.fireEditingStopped();
         }
-        isEditorActive = false; // Ensure state is reset
+        isEditorActive = false;
     }
 
 }
