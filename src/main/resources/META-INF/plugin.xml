@@ -22,10 +22,10 @@
   ]]></description>
     <!-- 版本更新日志 -->
     <change-notes><![CDATA[
-    <b>0.0.1</b> Initial release.
-    <li>加载单词本</li>
-    <li>顺序翻页单词</li>
+    <b>0.0.2</b> Initial release.
+    <li>增加单词拼写框</li>
     <li>随机加载单词</li>
+    <li>优化提示信息</li>
   ]]></change-notes>
 
     <!-- Product and plugin compatibility requirements.
